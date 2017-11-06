@@ -1,25 +1,28 @@
 function [sun_rise_set, varargout] = sunRiseSet( lat, lng, UTCoff, date, PLOT)
 %SUNRISESET Compute apparent sunrise and sunset times in seconds.
-%     sun_rise_set = sunRiseSet( lat, lng, UTCoff, date, PLOT) Computes the *apparent** (refraction
+%     sun_rise_set = sunRiseSet( lat, lng, UTCoff, date) Computes the *apparent* (refraction
 %     corrected) sunrise  and sunset times in seconds from mignight and returns them as
 %     sun_rise_set.  lat and lng are the latitude (+ to N) and longitude (+ to E), UTCoff is the
 %     local time offset to UTC in hours and date is the date in format 'dd-mmm-yyyy' ( see below for
-%     an example). Set PLOT to true to create some plots.
+%     an example).
 % 
-%     [sun_rise_set, noon] = sunRiseSet( lat, lng, UTCoff, date, PLOT) additionally returns the
-%     solar noon in seconds from midnight.
+%     [sun_rise_set, noon] = sunRiseSet( lat, lng, UTCoff, date) additionally returns the solar noon
+%     in seconds from midnight.
 % 
-%     [sun_rise_set, noon, opt] = sunRiseSet( lat, lng, UTCoff, date, PLOT) additionally returns the
+%     [sun_rise_set, noon, opt] = sunRiseSet( lat, lng, UTCoff, date) additionally returns the
 %     information opt, which contains information on every second of the day:
 %       opt.elev_ang_corr   : Apparent (refraction corrected) solar elevation in degrees
 %       opt.azmt_ang        : Solar azimuthal angle (deg cw from N)
 %       opt.solar_decl      : Solar declination in degrees
 % 
+%     sun_rise_set = sunRiseSet( ..., PLOT) If PLOT is true, plots of the elevation and azimuthal
+%     angle are created.
+% 
 % EXAMPLE:
-%     lat = -23.545570;     % Latitude
-%     lng = -46.704082;     % Longitude
-%     UTCoff = -3;          % UTC offset
-%     date = '15-mar-2017';
+%     lat = 47.377037;    % Latitude (Zurich, CH)
+%     lng = 8.553952;     % Longitude (Zurich, CH)
+%     UTCoff = 2;         % UTC offset
+%     date = '15-jun-2017';
 % 
 %     [sun_rise_set, noon, opt] = sunRiseSet( lat, lng, UTCoff, date, 1);
 %
@@ -36,6 +39,9 @@ function [sun_rise_set, varargout] = sunRiseSet( lat, lng, UTCoff, date, PLOT)
 nDays = daysact('30-dec-1899',  date);  % Number of days since 01/01
 nTimes = 24*3600;                       % Number of seconds in the day
 tArray = linspace(0,1,nTimes);
+if nargin < 5
+    PLOT = false;
+end
 
 % Compute
 % Letters correspond to colums in the NOAA Excel
