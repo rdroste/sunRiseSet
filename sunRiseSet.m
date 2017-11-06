@@ -1,15 +1,15 @@
 function [sun_rise_set, varargout] = sunRiseSet( lat, lng, UTCoff, date, PLOT)
 %SUNRISESET Compute apparent sunrise and sunset times in seconds.
-%     sun_rise_set = sunRiseSet( lat, lng, UTCoff, date) Computes the *apparent** (refraction
+%     sun_rise_set = sunRiseSet( lat, lng, UTCoff, date, PLOT) Computes the *apparent** (refraction
 %     corrected) sunrise  and sunset times in seconds from mignight and returns them as
 %     sun_rise_set.  lat and lng are the latitude (+ to N) and longitude (+ to E), UTCoff is the
 %     local time offset to UTC in hours and date is the date in format 'dd-mmm-yyyy' ( see below for
-%     an example).
+%     an example). Set PLOT to true to create some plots.
 % 
-%     [sun_rise_set, noon] = sunRiseSet( lat, lng, UTCoff, date) additionally returns the solar noon
-%     in seconds from midnight.
+%     [sun_rise_set, noon] = sunRiseSet( lat, lng, UTCoff, date, PLOT) additionally returns the
+%     solar noon in seconds from midnight.
 % 
-%     [sun_rise_set, noon, opt] = sunRiseSet( lat, lng, UTCoff, date) additionally returns the
+%     [sun_rise_set, noon, opt] = sunRiseSet( lat, lng, UTCoff, date, PLOT) additionally returns the
 %     information opt, which contains information on every second of the day:
 %       opt.elev_ang_corr   : Apparent (refraction corrected) solar elevation in degrees
 %       opt.azmt_ang        : Solar azimuthal angle (deg cw from N)
@@ -22,9 +22,6 @@ function [sun_rise_set, varargout] = sunRiseSet( lat, lng, UTCoff, date, PLOT)
 %     date = '15-mar-2017';
 % 
 %     [sun_rise_set, noon, opt] = sunRiseSet( lat, lng, UTCoff, date, 1);
-% 
-%     [sr_h, sr_m, sr_s] = hms(sun_rise_set(1));
-%     [ss_h, ss_m, ss_s] = hms(sun_rise_set(2));
 %
 % 
 % Richard Droste
@@ -72,14 +69,16 @@ X = (720-4*lng-V+UTCoff*60)*60;
 [~,sunset] = min(abs(X+round(W*4*60) - nTimes*tArray));
 
 % Results in degrees
-solar_decl = T;
-elev_ang_corr = 90-AD;
-AC_ind = AC > 0;
-azmt_ang = mod(rad2deg(acos(((sin(deg2rad(lat))*cos(deg2rad(AD)))-sin(deg2rad(T)))./ ...
-    (cos(deg2rad(lat))*sin(deg2rad(AD)))))+180,360);
-azmt_ang_2 = mod(540-rad2deg(acos(((sin(deg2rad(lat))*cos(deg2rad(AD)))-sin(deg2rad(T)))./ ...
-    (cos(deg2rad(lat))*sin(deg2rad(AD))))),360);
-azmt_ang(~AC_ind) = azmt_ang_2(~AC_ind);
+if nargout > 2 || PLOT
+    solar_decl = T;
+    elev_ang_corr = 90-AD;
+    AC_ind = AC > 0;
+    azmt_ang = mod(rad2deg(acos(((sin(deg2rad(lat))*cos(deg2rad(AD)))-sin(deg2rad(T)))./ ...
+        (cos(deg2rad(lat))*sin(deg2rad(AD)))))+180,360);
+    azmt_ang_2 = mod(540-rad2deg(acos(((sin(deg2rad(lat))*cos(deg2rad(AD)))-sin(deg2rad(T)))./ ...
+        (cos(deg2rad(lat))*sin(deg2rad(AD))))),360);
+    azmt_ang(~AC_ind) = azmt_ang_2(~AC_ind);
+end
     
 % Print in hours, minutes and seconds
 fprintf('Sunrise: %s  \nSunset:  %s\n', ...
@@ -109,6 +108,6 @@ if PLOT
     xlim([0 24]), grid on
     title('Azimuthal Angle')
 end
-    
-    
+
+
     
